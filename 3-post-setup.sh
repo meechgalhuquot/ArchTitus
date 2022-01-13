@@ -16,13 +16,13 @@ Final Setup and Configurations
 GRUB EFI Bootloader Install & Check
 "
 source /root/ArchTitus/setup.conf
-genfstab -U /mnt >> /mnt/etc/fstab
+genfstab -U / >> /etc/fstab
 if [[ -d "/sys/firmware/efi" ]]; then
     grub-install --efi-directory=/boot ${DISK}
 fi
 # set kernel parameter for decrypting the drive
 if [[ "${FS}" == "luks" ]]; then
-sed -i "s%GRUB_CMDLINE_LINUX_DEFAULT=\"%GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=UUID=${ENCRYPTED_PARTITION_UUID}:ROOT root=/dev/mapper/ROOT %g" /etc/default/grub
+sed -i "s%GRUB_CMDLINE_LINUX_DEFAULT=\"%GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=UUID=${encryped_partition_uuid}:ROOT root=/dev/mapper/ROOT %g" /etc/default/grub
 fi
 
 echo -e "Installing CyberRe Grub theme..."
