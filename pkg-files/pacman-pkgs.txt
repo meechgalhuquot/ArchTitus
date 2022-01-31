@@ -42,6 +42,7 @@ egl-wayland
 exfat-utils
 extra-cmake-modules
 filelight
+flatpak
 flex
 fuse2
 fuse3
@@ -50,7 +51,6 @@ gamemode
 gcc
 gimp
 git
-gparted
 gptfdisk
 grub
 grub-customizer
@@ -100,11 +100,14 @@ oxygen
 p7zip
 pacman-contrib
 papirus-icon-theme
+partitionmanager
 patch
 picom
 pkgconf
 plasma-nm
 plasma-pa
+plasma-wayland-session
+plasma-wayland-protocols
 powerdevil
 powerline-fonts
 print-manager
@@ -146,8 +149,10 @@ wine-mono
 winetricks
 xdg-desktop-portal-kde
 xdg-user-dirs
+yakuake
 zeroconf-ioslave
 zip
 zsh
 zsh-syntax-highlighting
 zsh-autosuggestions
+packagekit-qt5
