@@ -103,6 +103,10 @@ papirus-icon-theme
 partitionmanager
 patch
 picom
+pipewire
+pipewire-alsa
+pipewire-jack
+pipewire-pulse
 pkgconf
 plasma-nm
 plasma-pa
@@ -111,9 +115,6 @@ plasma-wayland-protocols
 powerdevil
 powerline-fonts
 print-manager
-pulseaudio
-pulseaudio-alsa
-pulseaudio-bluetooth
 python-notify2
 python-psutil
 python-pyqt5
@@ -147,6 +148,7 @@ which
 wine-gecko
 wine-mono
 winetricks
+xdg-desktop-portal
 xdg-desktop-portal-kde
 xdg-user-dirs
 yakuake
