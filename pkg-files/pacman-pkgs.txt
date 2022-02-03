@@ -27,6 +27,7 @@ breeze
 breeze-gtk
 bridge-utils
 btrfs-progs
+carla
 celluloid
 cmatrix
 code
@@ -126,6 +127,7 @@ sddm-kcm
 snapper
 snap-pac
 spectacle
+stacer
 steam
 sudo
 swtpm
