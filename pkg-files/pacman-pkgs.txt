@@ -129,6 +129,7 @@ snap-pac
 spectacle
 stacer
 steam
+steam-devices
 sudo
 swtpm
 synergy
