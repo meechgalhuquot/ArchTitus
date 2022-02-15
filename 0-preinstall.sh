@@ -74,23 +74,10 @@ createsubvolumes () {
 }
 
 mountallsubvol () {
-    mount -o ${MOUNT_OPTIONS},subvol=@home ${partition3} /mnt/home
-    mount -o ${MOUNT_OPTIONS},subvol=@tmp ${partition3} /mnt/tmp
-    mount -o ${MOUNT_OPTIONS},subvol=@.snapshots ${partition3} /mnt/.snapshots
-    mount -o ${MOUNT_OPTIONS},subvol=@var ${partition3} /mnt/var
-}
-
-subvolumesetup () {
-# create nonroot subvolumes
-    createsubvolumes     
-# unmount root to remount with subvolume 
-    umount /mnt
-# mount @ subvolume
-    mount -o ${MOUNT_OPTIONS},subvol=@ ${partition3} /mnt
-# make directories home, .snapshots, var, tmp
-    mkdir -p /mnt/{home,var,tmp,.snapshots}
-# mount subvolumes
-    mountallsubvol
+    mount -o ${mountoptions},subvol=@home /dev/mapper/ROOT /mnt/home
+    mount -o ${mountoptions},subvol=@tmp /dev/mapper/ROOT /mnt/tmp
+    mount -o ${mountoptions},subvol=@.snapshots /dev/mapper/ROOT /mnt/.snapshots
+    mount -o ${mountoptions},subvol=@var /dev/mapper/ROOT /mnt/var
 }
 
 if [[ "${DISK}" =~ "nvme" ]]; then
@@ -105,7 +92,6 @@ if [[ "${FS}" == "btrfs" ]]; then
     mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
     mkfs.btrfs -L ROOT ${partition3} -f
     mount -t btrfs ${partition3} /mnt
-    subvolumesetup
 elif [[ "${FS}" == "ext4" ]]; then
     mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
     mkfs.ext4 -L ROOT ${partition3}
@@ -113,16 +99,31 @@ elif [[ "${FS}" == "ext4" ]]; then
 elif [[ "${FS}" == "luks" ]]; then
     mkfs.vfat -F32 -n "EFIBOOT" ${partition2}
 # enter luks password to cryptsetup and format root partition
-    echo -n "${LUKS_PASSWORD}" | cryptsetup -y -v luksFormat ${partition3} -
+    echo -n "${luks_password}" | cryptsetup -y -v luksFormat ${partition3} -
 # open luks container and ROOT will be place holder 
-    echo -n "${LUKS_PASSWORD}" | cryptsetup open ${partition3} ROOT -
+    echo -n "${luks_password}" | cryptsetup open ${partition3} ROOT -
 # now format that container
-    mkfs.btrfs -L ROOT ${partition3}
+    mkfs.btrfs -L ROOT /dev/mapper/ROOT
 # create subvolumes for btrfs
-    mount -t btrfs ${partition3} /mnt
-    subvolumesetup
+    mount -t btrfs /dev/mapper/ROOT /mnt
+    createsubvolumes       
+    umount /mnt
+# mount @ subvolume
+    mount -o ${mountoptions},subvol=@ /dev/mapper/ROOT /mnt
+# make directories home, .snapshots, var, tmp
+    mkdir -p /mnt/{home,var,tmp,.snapshots}
+# mount subvolumes
+    mountallsubvol
 # store uuid of encrypted partition for grub
-    echo ENCRYPTED_PARTITION_UUID=$(blkid -s UUID -o value ${partition3}) >> setup.conf
+    echo encryped_partition_uuid=$(blkid -s UUID -o value ${partition3}) >> setup.conf
+fi
+
+# checking if user selected btrfs
+if [[ ${FS} =~ "btrfs" ]]; then
+ls /mnt | xargs btrfs subvolume delete
+btrfs subvolume create /mnt/@
+umount /mnt
+mount -t btrfs -o subvol=@ -L ROOT /mnt
 fi
 
 # mount target
@@ -159,8 +160,8 @@ echo -ne "
                     Checking for low memory systems <8G
 -------------------------------------------------------------------------
 "
-TOTAL_MEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
-if [[  $TOTAL_MEM -lt 8000000 ]]; then
+TOTALMEM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
+if [[  $TOTALMEM -lt 8000000 ]]; then
     # Put swap into the actual system, not into RAM disk, otherwise there is no point in it, it'll cache RAM into RAM. So, /mnt/ everything.
     mkdir /mnt/opt/swap # make a dir that we can apply NOCOW to to make it btrfs-friendly.
     chattr +C /mnt/opt/swap # apply NOCOW, btrfs needs that.
