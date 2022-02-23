@@ -32,9 +32,6 @@ spectacle
 systemsettings
 xdg-desktop-portal-kde
 zeroconf-ioslave
-
-
 plasma-wayland-session
 plasma-wayland-protocols
-
 sddm-kcm
